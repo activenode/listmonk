@@ -10,7 +10,7 @@ builds:
   - binary: listmonk
     main: ./cmd
     goos:
-      - windows
+      # - windows
       - darwin
       - linux
       - freebsd
