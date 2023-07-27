@@ -1,0 +1,62 @@
+version: "3.7"
+
+x-app-defaults: &app-defaults
+  restart: unless-stopped
+  # image: activenode/listmonk-arm64:latest
+  image: listmonk/listmonk:latest
+  ports:
+    - "9000:9000"
+  networks:
+    - listmonk
+    - web
+  environment:
+    - TZ=Europe/Berlin
+
+x-db-defaults: &db-defaults
+  image: postgres:15
+  networks:
+    - listmonk
+  environment:
+    - POSTGRES_PASSWORD=listmonk
+    - POSTGRES_USER=listmonk
+    - POSTGRES_DB=listmonk
+  restart: unless-stopped
+  healthcheck:
+    test: ["CMD-SHELL", "pg_isready -U listmonk"]
+    interval: 10s
+    timeout: 5s
+    retries: 6
+
+services:
+  db:
+    <<: *db-defaults
+    container_name: listmonk_db
+    hostname: listmonk_db
+    volumes:
+      - type: volume
+        source: listmonk-data
+        target: /var/lib/postgresql/data
+
+  app:
+    <<: *app-defaults
+    container_name: listmonk_app
+    depends_on:
+      - db
+    volumes:
+      - ./config.toml:/listmonk/config.toml
+    command:
+      [
+        "./listmonk",
+        "--install",
+        "--idempotent",
+        "--yes",
+        "--continue-after-install",
+      ]
+
+networks:
+  listmonk:
+  web:
+    # external: true
+
+volumes:
+  listmonk-data:

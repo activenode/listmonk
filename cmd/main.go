@@ -99,6 +99,7 @@ func init() {
 		os.Exit(0)
 	}
 
+
 	lo.Println(buildString)
 
 	// Generate new config.
@@ -132,7 +133,11 @@ func init() {
 	if ko.Bool("install") {
 		// Save the version of the last listed migration.
 		install(migList[len(migList)-1].version, db, fs, !ko.Bool("yes"), ko.Bool("idempotent"))
-		os.Exit(0)
+
+		if !ko.Bool("continue-after-install") {
+			lo.Println("exiting after install now (else use --continue-after-install)")
+			os.Exit(0)
+		}
 	}
 
 	// Check if the DB schema is installed.

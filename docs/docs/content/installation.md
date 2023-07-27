@@ -3,11 +3,11 @@
 listmonk requires Postgres ⩾ v9.4.
 
 ## Binary
+
 - Download the [latest release](https://github.com/knadh/listmonk/releases) and extract the listmonk binary.
 - `./listmonk --new-config` to generate config.toml. Then, edit the file.
 - `./listmonk --install` to install the tables in the Postgres DB.
 - Run `./listmonk` and visit `http://localhost:9000`.
-
 
 ## Docker
 
@@ -32,7 +32,7 @@ docker-compose up -d demo-db demo-app
 ```
 
 !!! warning
-    The demo does not persist Postgres after the containers are removed. **DO NOT** use this demo setup in production.
+The demo does not persist Postgres after the containers are removed. **DO NOT** use this demo setup in production.
 
 ### Production
 
@@ -52,7 +52,7 @@ The above shell script performs the following actions:
 - Runs the `listmonk` container.
 
 !!! note
-    It's recommended to examine the contents of the shell script, before running in your environment.
+It's recommended to examine the contents of the shell script, before running in your environment.
 
 #### Manual Docker install
 
@@ -61,8 +61,8 @@ The following workflow is recommended to setup `listmonk` manually using `docker
 - `docker-compose up db` to run the Postgres DB.
 - `docker-compose run --rm app ./listmonk --install` to setup the DB (or `--upgrade` to upgrade an existing DB).
 - Copy `config.toml.sample` to your directory and make the following changes:
-    - `app.address` => `0.0.0.0:9000` (Port forwarding on Docker will work only if the app is advertising on all interfaces.)
-    - `db.host` => `listmonk_db` (Container Name of the DB container)
+  - `app.address` => `0.0.0.0:9000` (Port forwarding on Docker will work only if the app is advertising on all interfaces.)
+  - `db.host` => `listmonk_db` (Container Name of the DB container)
 - Run `docker-compose up app` and visit `http://localhost:9000`.
 
 ##### Mounting a custom config.toml
@@ -79,7 +79,7 @@ To mount a local `config.toml` file, add the following section to `docker-compos
 ```
 
 !!! note
-    Some common changes done inside `config.toml` for Docker based setups:
+Some common changes done inside `config.toml` for Docker based setups:
 
     - Change `app.address` to `0.0.0.0:9000`.
     - Change `db.host` to `listmonk_db`.
@@ -107,13 +107,19 @@ max_lifetime = "300s"
 
 Mount the local `config.toml` inside the container at `listmonk/config.toml`.
 
-!!! tip
-    - See [configuring with environment variables](../configuration) for variables like `app.admin_password` and `db.password`
-    - Ensure that both `app` and `db` containers are in running. If the containers are not running, restart them `docker-compose restart app db`.
-    - Refer to [this tutorial](https://yasoob.me/posts/setting-up-listmonk-opensource-newsletter-mailing/) for setting up a production instance with Docker + Nginx + LetsEncrypt SSL.
+!!! tip - See [configuring with environment variables](../configuration) for variables like `app.admin_password` and `db.password` - Ensure that both `app` and `db` containers are in running. If the containers are not running, restart them `docker-compose restart app db`. - Refer to [this tutorial](https://yasoob.me/posts/setting-up-listmonk-opensource-newsletter-mailing/) for setting up a production instance with Docker + Nginx + LetsEncrypt SSL.
 
 !!! info
-    The example `docker-compose.yml` file works with Docker Engine 18.06.0+ and `docker-compose` which supports file format 3.7.
+The example `docker-compose.yml` file works with Docker Engine 18.06.0+ and `docker-compose` which supports file format 3.7.
+
+#### Using docker-compose with Docker Swarm / Stacks
+
+Using Docker Swarm can come in very handy. E.g. using listmonk as a Stack (DB + Listmonk).
+However in abstractions such as Portainer it can be extremely cumbersome to do the steps above.
+
+That's why here is a solution that definitely works for stacks but can also be applied for docker-compose use cases without Swarm.
+
+tbd
 
 ## Compiling from source
 
@@ -128,7 +134,6 @@ To compile the latest unreleased version (`master` branch):
 The `master` branch with bleeding edge changes is periodically built and published as `listmonk/listmonk:rc` on DockerHub. To run the latest pre-release version, replace all instances of `listmonk/listmonk:latest` with `listmonk/listmonk:rc` in the docker-compose.yml file and follow the Docker installation steps above. While it is generally safe to run release candidate versions, they may have issues that only get resolved in a general release.
 
 ## 3rd party hosting
-
 
 <a href="https://railway.app/new/template/listmonk"><img src="https://camo.githubusercontent.com/081df3dd8cff37aab35044727b02b94a8e948052487a8c6253e190f5940d776d/68747470733a2f2f7261696c7761792e6170702f627574746f6e2e737667" alt="One-click deploy on Raleway" style="max-height: 32px;" /></a>
 <br />
