@@ -13,9 +13,9 @@ builds:
       # - windows
       # - darwin
       - linux
-      - freebsd
-      - openbsd
-      - netbsd
+      # - freebsd
+      # - openbsd
+      # - netbsd
     goarch:
       - amd64
       - arm64
