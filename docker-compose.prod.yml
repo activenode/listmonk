@@ -44,8 +44,8 @@ services:
       - db
     volumes:
       - ./config.toml:/listmonk/config.toml
-    command:
-      [
+    command: [
+        # also add copying a secret from /run/secrets/config.toml to /listmonk/config.toml if exists
         "./listmonk",
         "--install",
         "--idempotent",
