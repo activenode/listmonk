@@ -126,6 +126,7 @@ func initFlags() {
 	f.Bool("version", false, "show current version of the build")
 	f.Bool("new-config", false, "generate sample config file")
 	f.String("static-dir", "", "(optional) path to directory with static files")
+	f.Bool("continue-after-install", "", "(optional) do not exit after install but instead start listmonk")
 	f.String("i18n-dir", "", "(optional) path to directory with i18n language files")
 	f.Bool("yes", false, "assume 'yes' to prompts during --install/upgrade")
 	f.Bool("passive", false, "run in passive mode where campaigns are not processed")
