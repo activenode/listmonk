@@ -703,6 +703,7 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	var (
 		mem     runtime.MemStats
 		utsname syscall.Utsname
+		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
 	)
 
 	// Memory / alloc stats.

@@ -11,7 +11,7 @@ builds:
     main: ./cmd
     goos:
       # - windows
-      - darwin
+      # - darwin
       - linux
       - freebsd
       - openbsd
