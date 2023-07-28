@@ -42,7 +42,8 @@ services:
     container_name: listmonk_app
     depends_on:
       - db
-    command: [
+    command:
+      [
         # also add copying a secret from /run/secrets/config.toml to /listmonk/config.toml if exists
         "./listmonk",
         "--install",
@@ -51,6 +52,9 @@ services:
         "--continue-after-install",
         "--config=/run/secrets/listmonk_config_toml",
       ]
+      # alternative:
+      # using idempotent with &&
+      # command: [sh, -c, "yes | ./listmonk --install --idempotent --config ... && ./listmonk --config config-demo.toml"]
     secrets:
       - listmonk_config_toml
 
