@@ -2,10 +2,9 @@ version: "3.7"
 
 x-app-defaults: &app-defaults
   restart: unless-stopped
-  # image: activenode/listmonk-arm64:latest
-  image: listmonk/listmonk:latest
+  image: activenode/listmonk:latest
   ports:
-    - "9000:9000"
+    - "9087:9000"
   networks:
     - listmonk
     - web
@@ -17,9 +16,9 @@ x-db-defaults: &db-defaults
   networks:
     - listmonk
   environment:
-    - POSTGRES_PASSWORD=listmonk
-    - POSTGRES_USER=listmonk
-    - POSTGRES_DB=listmonk
+    - POSTGRES_PASSWORD=listmonk_pass
+    - POSTGRES_USER=listmonk_user
+    - POSTGRES_DB=listmonkdb
   restart: unless-stopped
   healthcheck:
     test: ["CMD-SHELL", "pg_isready -U listmonk"]
@@ -40,10 +39,12 @@ services:
   app:
     <<: *app-defaults
     container_name: listmonk_app
+    volumes:
+      - type: volume
+        source: listmonk-uploads
+        target: /listmonk/uploads
     depends_on:
       - db
-    volumes:
-      - ./config.toml:/listmonk/config.toml
     command:
       [
         "./listmonk",
@@ -51,12 +52,24 @@ services:
         "--idempotent",
         "--yes",
         "--continue-after-install",
+        "--config=/run/secrets/listmonk_config_toml",
       ]
+      # alternative:
+      # using idempotent with &&
+      # but that would need sh -c and isn't just one process...
+      # command: [sh, -c, "yes | ./listmonk --install --idempotent --config ... && ./listmonk --config config-demo.toml"]
+    secrets:
+      - listmonk_config_toml
 
 networks:
   listmonk:
   web:
-    # external: true
+    external: true
+
+secrets:
+  listmonk_config_toml:
+    external: true
 
 volumes:
   listmonk-data:
+  listmonk-uploads:

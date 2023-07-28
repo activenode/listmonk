@@ -112,14 +112,42 @@ Mount the local `config.toml` inside the container at `listmonk/config.toml`.
 !!! info
 The example `docker-compose.yml` file works with Docker Engine 18.06.0+ and `docker-compose` which supports file format 3.7.
 
-#### Using docker-compose with Docker Swarm / Stacks
+#### Using docker-compose: Docker Swarm / Stacks + Secrets
 
-Using Docker Swarm can come in very handy. E.g. using listmonk as a Stack (DB + Listmonk).
-However in abstractions such as Portainer it can be extremely cumbersome to do the steps above.
+Using Docker Swarm (e.g. in Portainer) can come in very handy.
+E.g. using listmonk as a Stack (DB + Listmonk).
+However in abstractions such as Portainer it can be extremely cumbersome to do the steps above (first install then run again).
 
 That's why here is a solution that definitely works for stacks but can also be applied for docker-compose use cases without Swarm.
 
-tbd
+Download the `docker-compose.stack-demo.yml` and adapt it to your needs:
+
+```bash
+wget -O docker-compose.yml https://raw.githubusercontent.com/knadh/listmonk/master/docker-compose.stack-demo.yml
+```
+
+You will see that it overrides the command calling the `./listmonk` binary with
+additional flags:
+
+```yml
+command:
+  [
+    "./listmonk",
+    "--install",
+    "--idempotent",
+    "--yes",
+    "--continue-after-install",
+    "--config=/run/secrets/listmonk_config_toml",
+  ]
+```
+
+This setup ensures that it installs it according to the config but it won't override the database
+if the listmonk database already exists (that is basically the `--idempotent` flag).
+
+!!! info
+The above command passes a secret as config toml.
+If you are working with docker secrets (recommended) then the only thing you have to do is creating
+a properly named secret with `docker secret create listmonk_config_toml ./your_config.toml`. If however you want to simply use a `volume` for that you have to remove the `--config=/run...` part in the `docker-compose.yml` file and also get rid of the `secrets` definitions.
 
 ## Compiling from source
 
@@ -139,3 +167,7 @@ The `master` branch with bleeding edge changes is periodically built and publish
 <br />
 <a href="https://www.pikapods.com/pods?run=listmonk"><img src="https://www.pikapods.com/static/run-button.svg" alt="Deploy on PikaPod" /></a>
 <a href ="https://github.com/paulrudy/listmonk-on-fly">Tutorial for deploying on Fly.io</a>
+
+```
+
+```

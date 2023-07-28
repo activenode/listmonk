@@ -40,6 +40,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
 	flag "github.com/spf13/pflag"
+	"github.com/zcalusic/sysinfo" // to replace syscall info
 )
 
 const (
@@ -125,8 +126,8 @@ func initFlags() {
 	f.Bool("upgrade", false, "upgrade database to the current version")
 	f.Bool("version", false, "show current version of the build")
 	f.Bool("new-config", false, "generate sample config file")
+	f.Bool("continue-after-install", false, "(optional) do not exit after install but instead start listmonk")
 	f.String("static-dir", "", "(optional) path to directory with static files")
-	f.Bool("continue-after-install", "", "(optional) do not exit after install but instead start listmonk")
 	f.String("i18n-dir", "", "(optional) path to directory with i18n language files")
 	f.Bool("yes", false, "assume 'yes' to prompts during --install/upgrade")
 	f.Bool("passive", false, "run in passive mode where campaigns are not processed")
@@ -701,23 +702,41 @@ func initBounceManager(app *App) *bounce.Manager {
 
 func initAbout(q *models.Queries, db *sqlx.DB) about {
 	var (
-		mem     runtime.MemStats
-		utsname syscall.Utsname
+		mem runtime.MemStats
+		si  sysinfo.SysInfo
 	)
+
+	si.GetSysInfo() // OS info.
+	// Previously used Utsname for OS Info but Utsname does not work multi-arch (so do not use it):
+	// [ref=https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang]
+
+	data, err := json.MarshalIndent(&si, "", "  ")
+	if err != nil {
+		lo.Printf("WARNING: error getting system info: %v", err)
+	}
+
+	lo.Println("data", data)
 
 	// Memory / alloc stats.
 	runtime.ReadMemStats(&mem)
-
-	// OS info.
-	if err := syscall.Uname(&utsname); err != nil {
-		lo.Printf("WARNING: error getting system info: %v", err)
-	}
 
 	// DB dbv.
 	info := types.JSONText(`{}`)
 	if err := db.QueryRow(q.GetDBInfo).Scan(&info); err != nil {
 		lo.Printf("WARNING: error getting database version: %v", err)
 	}
+
+	// grabbing universal arch system info now
+	system_hostname, _ := os.Hostname()
+	system_os := runtime.GOOS
+
+	// the next 2 could be empty depending on the arch. either we use
+	// a different lib now or we simply agree that linux is okay. we could
+	// also use this in the future:
+	// https://stackoverflow.com/a/19847868
+	// -> writing our own function and then grabbing the info depending on arch
+	system_release := si.OS.Release
+	system_machine := si.Node.MachineID
 
 	return about{
 		Version:   versionString,
@@ -729,10 +748,10 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 			NumCPU: runtime.NumCPU(),
 		},
 		Host: aboutHost{
-			OS:        int8ToStr(utsname.Sysname[:]),
-			OSRelease: int8ToStr(utsname.Release[:]),
-			Machine:   int8ToStr(utsname.Machine[:]),
-			Hostname:  int8ToStr(utsname.Nodename[:]),
+			OS:        system_os,
+			OSRelease: system_release,
+			Machine:   system_machine,
+			Hostname:  system_hostname,
 		},
 	}
 

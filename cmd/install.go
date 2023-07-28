@@ -17,7 +17,7 @@ import (
 
 // install runs the first time setup of creating and
 // migrating the database and creating the super user.
-func install(lastVer string, db *sqlx.DB, fs stuffbin.FileSystem, prompt, idempotent bool) {
+func install(lastVer string, db *sqlx.DB, fs stuffbin.FileSystem, prompt, idempotent bool, continueAfterInstall bool) {
 	qMap := readQueries(queryFilePath, db, fs)
 
 	fmt.Println("")
@@ -51,7 +51,14 @@ func install(lastVer string, db *sqlx.DB, fs stuffbin.FileSystem, prompt, idempo
 			}
 		} else {
 			lo.Println("skipping install as database appears to be already setup")
-			os.Exit(0)
+
+			if !continueAfterInstall {
+				lo.Println("exiting now (use --continue-after-install to continue)")
+				os.Exit(0)
+			} else {
+				// simply end the function to avoid resetting up the database and pulling queries
+				return
+			}
 		}
 	}
 
