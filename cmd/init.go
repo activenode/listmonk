@@ -729,6 +729,14 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	system_hostname, _ := os.Hostname()
 	system_os := runtime.GOOS
 
+	// the next 2 could be empty depending on the arch. either we use
+	// a different lib now or we simply agree that linux is okay. we could
+	// also use this in the future:
+	// https://stackoverflow.com/a/19847868
+	// -> writing our own function and then grabbing the info depending on arch
+	system_release := si.OS.Release
+	system_machine := si.Node.MachineID
+
 	return about{
 		Version:   versionString,
 		Build:     buildString,
@@ -741,8 +749,8 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 		//TODO: fix those because syscall apparently led to problems with multi-arch
 		Host: aboutHost{
 			OS:        system_os,
-			OSRelease: "this",
-			Machine:   "even",
+			OSRelease: system_release,
+			Machine:   system_machine,
 			Hostname:  system_hostname,
 		},
 	}
