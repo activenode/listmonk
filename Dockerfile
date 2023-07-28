@@ -6,6 +6,3 @@ COPY config.toml.sample config.toml
 COPY config-demo.toml .
 CMD ["./listmonk"]
 EXPOSE 9000
-
-
-# /listmonk/config.toml
