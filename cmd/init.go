@@ -710,12 +710,11 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	// Previously used Utsname for OS Info but Utsname does not work multi-arch (so do not use it):
 	// [ref=https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang]
 
-	data, err := json.MarshalIndent(&si, "", "  ")
+	_, err := json.MarshalIndent(&si, "", "  ")
 	if err != nil {
+		// just to check if it works
 		lo.Printf("WARNING: error getting system info: %v", err)
 	}
-
-	lo.Println("data", data)
 
 	// Memory / alloc stats.
 	runtime.ReadMemStats(&mem)
@@ -735,6 +734,7 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	// also use this in the future:
 	// https://stackoverflow.com/a/19847868
 	// -> writing our own function and then grabbing the info depending on arch
+	// but this is still better than NON-working Utsname
 	system_release := si.OS.Release
 	system_machine := si.Node.MachineID
 
