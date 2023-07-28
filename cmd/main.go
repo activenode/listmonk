@@ -131,14 +131,7 @@ func init() {
 	// as the installer needs to work on an empty DB.
 	if ko.Bool("install") {
 		// Save the version of the last listed migration.
-		install(
-			migList[len(migList)-1].version, 
-			db, 
-			fs, 
-			!ko.Bool("yes"), 
-			ko.Bool("idempotent"), 
-			ko.Bool("continue-after-install")
-		)
+		install(migList[len(migList)-1].version, db, fs, !ko.Bool("yes"), ko.Bool("idempotent"), ko.Bool("continue-after-install"))
 
 		if !ko.Bool("continue-after-install") {
 			lo.Println("exiting after install now (else use --continue-after-install)")
