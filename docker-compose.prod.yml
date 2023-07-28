@@ -42,8 +42,6 @@ services:
     container_name: listmonk_app
     depends_on:
       - db
-    # volumes:
-    #   - listmonk-config-toml:/listmonk/config.toml
     command: [
         # also add copying a secret from /run/secrets/config.toml to /listmonk/config.toml if exists
         "./listmonk",
