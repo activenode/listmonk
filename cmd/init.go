@@ -39,6 +39,7 @@ import (
 	"github.com/knadh/stuffbin"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
+	"github.com/zcalusic/sysinfo" // to replace syscall info 
 	flag "github.com/spf13/pflag"
 )
 
@@ -702,17 +703,21 @@ func initBounceManager(app *App) *bounce.Manager {
 func initAbout(q *models.Queries, db *sqlx.DB) about {
 	var (
 		mem     runtime.MemStats
-		utsname syscall.Utsname
+		si	sysinfo.SysInfo
 		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
 	)
 
-	// Memory / alloc stats.
-	runtime.ReadMemStats(&mem)
+	si.GetSysInfo() // OS info.
 
-	// OS info.
-	if err := syscall.Uname(&utsname); err != nil {
+	data, err := json.MarshalIndent(&si, "", "  ")
+	if err != nil {
 		lo.Printf("WARNING: error getting system info: %v", err)
 	}
+
+	lo.Println("data", data)
+
+	// Memory / alloc stats.
+	runtime.ReadMemStats(&mem)
 
 	// DB dbv.
 	info := types.JSONText(`{}`)
@@ -729,15 +734,56 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 		System: aboutSystem{
 			NumCPU: runtime.NumCPU(),
 		},
+		//TODO: fix those because syscall apparently led to problems with multi-arch
 		Host: aboutHost{
-			OS:        int8ToStr(utsname.Sysname[:]),
-			OSRelease: int8ToStr(utsname.Release[:]),
-			Machine:   int8ToStr(utsname.Machine[:]),
-			Hostname:  int8ToStr(utsname.Nodename[:]),
+			OS:        "does",
+			OSRelease: "this",
+			Machine:   "even",
+			Hostname:  "matter",
 		},
 	}
 
 }
+
+// func initAbout(q *models.Queries, db *sqlx.DB) about {
+// 	var (
+// 		mem     runtime.MemStats
+// 		utsname syscall.Utsname
+// 		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
+// 	)
+
+// 	// Memory / alloc stats.
+// 	runtime.ReadMemStats(&mem)
+
+// 	// OS info.
+// 	if err := syscall.Uname(&utsname); err != nil {
+// 		lo.Printf("WARNING: error getting system info: %v", err)
+// 	}
+
+// 	// DB dbv.
+// 	info := types.JSONText(`{}`)
+// 	if err := db.QueryRow(q.GetDBInfo).Scan(&info); err != nil {
+// 		lo.Printf("WARNING: error getting database version: %v", err)
+// 	}
+
+// 	return about{
+// 		Version:   versionString,
+// 		Build:     buildString,
+// 		GoArch:    runtime.GOARCH,
+// 		GoVersion: runtime.Version(),
+// 		Database:  info,
+// 		System: aboutSystem{
+// 			NumCPU: runtime.NumCPU(),
+// 		},
+// 		Host: aboutHost{
+// 			OS:        int8ToStr(utsname.Sysname[:]),
+// 			OSRelease: int8ToStr(utsname.Release[:]),
+// 			Machine:   int8ToStr(utsname.Machine[:]),
+// 			Hostname:  int8ToStr(utsname.Nodename[:]),
+// 		},
+// 	}
+
+// }
 
 // initHTTPServer sets up and runs the app's main HTTP server and blocks forever.
 func initHTTPServer(app *App) *echo.Echo {
