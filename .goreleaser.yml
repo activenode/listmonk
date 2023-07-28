@@ -1,6 +1,7 @@
 env:
   - GO111MODULE=on
   - CGO_ENABLED=0
+  - GITHUB_ORG=activenode
 
 before:
   hooks:
@@ -120,8 +121,8 @@ dockers:
     image_templates:
       - "activenode/{{ .ProjectName }}:latest-armv7"
       - "activenode/{{ .ProjectName }}:{{ .Tag }}-armv7"
-      - "ghcr.io/activenode/{{ .ProjectName }}:latest-armv7"
-      - "ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}-armv7"
+      - "ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest-armv7"
+      - "ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}-armv7"
     build_flag_templates:
       - --platform=linux/arm/v7
       - --label=org.opencontainers.image.title={{ .ProjectName }}
@@ -150,15 +151,15 @@ docker_manifests:
       - activenode/{{ .ProjectName }}:{{ .Tag }}-arm64v8
       - activenode/{{ .ProjectName }}:{{ .Tag }}-armv6
       - activenode/{{ .ProjectName }}:{{ .Tag }}-armv7
-  - name_template: ghcr.io/knadh/{{ .ProjectName }}:latest
+  - name_template: ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest
     image_templates:
-      - ghcr.io/activenode/{{ .ProjectName }}:latest-amd64
-      - ghcr.io/activenode/{{ .ProjectName }}:latest-arm64v8
-      - ghcr.io/activenode/{{ .ProjectName }}:latest-armv6
-      - ghcr.io/activenode/{{ .ProjectName }}:latest-armv7
-  - name_template: ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest-amd64
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest-arm64v8
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest-armv6
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:latest-armv7
+  - name_template: ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}
     image_templates:
-      - ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}-amd64
-      - ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}-arm64v8
-      - ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}-armv6
-      - ghcr.io/activenode/{{ .ProjectName }}:{{ .Tag }}-armv7
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}-amd64
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}-arm64v8
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}-armv6
+      - ghcr.io/{{ .Env.GITHUB_ORG }}/{{ .ProjectName }}:{{ .Tag }}-armv7
