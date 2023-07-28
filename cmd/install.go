@@ -55,6 +55,9 @@ func install(lastVer string, db *sqlx.DB, fs stuffbin.FileSystem, prompt, idempo
 			if !continueAfterInstall {
 				lo.Println("exiting now (use --continue-after-install to continue)")
 				os.Exit(0)
+			} else {
+				// simply end the function to avoid resetting up the database and pulling queries
+				return
 			}
 		}
 	}
