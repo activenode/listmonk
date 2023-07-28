@@ -43,7 +43,7 @@ __________________
 - `./listmonk --install` to setup the Postgres DB (or `--upgrade` to upgrade an existing DB. Upgrades are idempotent and running them multiple times have no side effects).
 - `./listmonk --install --idempotent` to run the installation only when it hasn't been done yet.
 - Run `./listmonk` and visit `http://localhost:9000`.
-- All together (install + run): ``./listmonk --install --idempotent --yes --continue-after-install`
+- All together (install + run): `./listmonk --install --idempotent --yes --continue-after-install`
 
 See [installation docs](https://listmonk.app/docs/installation).
 __________________
