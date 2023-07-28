@@ -704,10 +704,11 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	var (
 		mem runtime.MemStats
 		si  sysinfo.SysInfo
-		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
 	)
 
 	si.GetSysInfo() // OS info.
+	// Previously used Utsname for OS Info but Utsname does not work multi-arch (so do not use it):
+	// [ref=https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang]
 
 	data, err := json.MarshalIndent(&si, "", "  ")
 	if err != nil {
@@ -746,7 +747,6 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 		System: aboutSystem{
 			NumCPU: runtime.NumCPU(),
 		},
-		//TODO: fix those because syscall apparently led to problems with multi-arch
 		Host: aboutHost{
 			OS:        system_os,
 			OSRelease: system_release,
@@ -756,46 +756,6 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 	}
 
 }
-
-// func initAbout(q *models.Queries, db *sqlx.DB) about {
-// 	var (
-// 		mem     runtime.MemStats
-// 		utsname syscall.Utsname
-// 		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
-// 	)
-
-// 	// Memory / alloc stats.
-// 	runtime.ReadMemStats(&mem)
-
-// 	// OS info.
-// 	if err := syscall.Uname(&utsname); err != nil {
-// 		lo.Printf("WARNING: error getting system info: %v", err)
-// 	}
-
-// 	// DB dbv.
-// 	info := types.JSONText(`{}`)
-// 	if err := db.QueryRow(q.GetDBInfo).Scan(&info); err != nil {
-// 		lo.Printf("WARNING: error getting database version: %v", err)
-// 	}
-
-// 	return about{
-// 		Version:   versionString,
-// 		Build:     buildString,
-// 		GoArch:    runtime.GOARCH,
-// 		GoVersion: runtime.Version(),
-// 		Database:  info,
-// 		System: aboutSystem{
-// 			NumCPU: runtime.NumCPU(),
-// 		},
-// 		Host: aboutHost{
-// 			OS:        int8ToStr(utsname.Sysname[:]),
-// 			OSRelease: int8ToStr(utsname.Release[:]),
-// 			Machine:   int8ToStr(utsname.Machine[:]),
-// 			Hostname:  int8ToStr(utsname.Nodename[:]),
-// 		},
-// 	}
-
-// }
 
 // initHTTPServer sets up and runs the app's main HTTP server and blocks forever.
 func initHTTPServer(app *App) *echo.Echo {
