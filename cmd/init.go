@@ -39,8 +39,8 @@ import (
 	"github.com/knadh/stuffbin"
 	"github.com/labstack/echo/v4"
 	"github.com/lib/pq"
-	"github.com/zcalusic/sysinfo" // to replace syscall info 
 	flag "github.com/spf13/pflag"
+	"github.com/zcalusic/sysinfo" // to replace syscall info
 )
 
 const (
@@ -702,8 +702,8 @@ func initBounceManager(app *App) *bounce.Manager {
 
 func initAbout(q *models.Queries, db *sqlx.DB) about {
 	var (
-		mem     runtime.MemStats
-		si	sysinfo.SysInfo
+		mem runtime.MemStats
+		si  sysinfo.SysInfo
 		// TODO: Maybe change this because of https://stackoverflow.com/questions/29415909/cannot-get-uname-by-golang
 	)
 
@@ -725,6 +725,10 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 		lo.Printf("WARNING: error getting database version: %v", err)
 	}
 
+	// grabbing universal arch system info now
+	system_hostname, _ := os.Hostname()
+	system_os := runtime.GOOS
+
 	return about{
 		Version:   versionString,
 		Build:     buildString,
@@ -736,10 +740,10 @@ func initAbout(q *models.Queries, db *sqlx.DB) about {
 		},
 		//TODO: fix those because syscall apparently led to problems with multi-arch
 		Host: aboutHost{
-			OS:        "does",
+			OS:        system_os,
 			OSRelease: "this",
 			Machine:   "even",
-			Hostname:  "matter",
+			Hostname:  system_hostname,
 		},
 	}
 
