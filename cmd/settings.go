@@ -264,6 +264,15 @@ func handleTestSMTPSettings(c echo.Context) error {
 		return echo.NewHTTPError(http.StatusBadRequest, app.i18n.Ts("globals.messages.missingFields", "name", "email"))
 	}
 
+	password := ko.String("password")
+	// now we have to check if the password only contains •••••••••••••••• chars because
+	// then we want to load the stored password instead.
+	if password == strings.Repeat(pwdMask, len(password)) {
+		errStr := "Doing a Test connection with a pre-existing/saved password is currently not supported. You can only test the connection for a new password (without saving it before)"
+		app.log.Printf(errStr)
+		return echo.NewHTTPError(http.StatusInternalServerError, errStr)
+	}
+
 	// Initialize a new SMTP pool.
 	req.MaxConns = 1
 	req.IdleTimeout = time.Second * 2
