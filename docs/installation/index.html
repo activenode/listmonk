@@ -803,7 +803,7 @@
 
 
 <h1 id="installation">Installation<a class="headerlink" href="#installation" title="Permanent link">&para;</a></h1>
-<p>listmonk requires Postgres ⩾ v9.4.</p>
+<p>listmonk requires Postgres ⩾ 12.</p>
 <h2 id="binary">Binary<a class="headerlink" href="#binary" title="Permanent link">&para;</a></h2>
 <ul>
 <li>Download the <a href="https://github.com/knadh/listmonk/releases">latest release</a> and extract the listmonk binary.</li>
@@ -825,8 +825,8 @@ docker-compose<span class="w"> </span>up<span class="w"> </span>-d<span class="w
 </code></pre></div>
 <div class="admonition warning">
 <p class="admonition-title">Warning</p>
-</div>
 <p>The demo does not persist Postgres after the containers are removed. <strong>DO NOT</strong> use this demo setup in production.</p>
+</div>
 <h3 id="production">Production<a class="headerlink" href="#production" title="Permanent link">&para;</a></h3>
 <h4 id="easy-docker-install_1">Easy Docker install<a class="headerlink" href="#easy-docker-install_1" title="Permanent link">&para;</a></h4>
 <p>This setup is recommended if you want to <em>quickly</em> setup <code>listmonk</code> in production.</p>
@@ -841,16 +841,18 @@ sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</spa
 </ul>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-</div>
 <p>It's recommended to examine the contents of the shell script, before running in your environment.</p>
+</div>
 <h4 id="manual-docker-install_1">Manual Docker install<a class="headerlink" href="#manual-docker-install_1" title="Permanent link">&para;</a></h4>
 <p>The following workflow is recommended to setup <code>listmonk</code> manually using <code>docker-compose</code>. You are encouraged to customise the contents of <code>docker-compose.yml</code> to your needs. The overall setup looks like:</p>
 <ul>
 <li><code>docker-compose up db</code> to run the Postgres DB.</li>
 <li><code>docker-compose run --rm app ./listmonk --install</code> to setup the DB (or <code>--upgrade</code> to upgrade an existing DB).</li>
-<li>Copy <code>config.toml.sample</code> to your directory and make the following changes:</li>
+<li>Copy <code>config.toml.sample</code> to your directory and make the following changes:<ul>
 <li><code>app.address</code> =&gt; <code>0.0.0.0:9000</code> (Port forwarding on Docker will work only if the app is advertising on all interfaces.)</li>
 <li><code>db.host</code> =&gt; <code>listmonk_db</code> (Container Name of the DB container)</li>
+</ul>
+</li>
 <li>Run <code>docker-compose up app</code> and visit <code>http://localhost:9000</code>.</li>
 </ul>
 <h5 id="mounting-a-custom-configtoml">Mounting a custom config.toml<a class="headerlink" href="#mounting-a-custom-configtoml" title="Permanent link">&para;</a></h5>
@@ -864,11 +866,12 @@ sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</spa
 </code></pre></div>
 <div class="admonition note">
 <p class="admonition-title">Note</p>
-</div>
 <p>Some common changes done inside <code>config.toml</code> for Docker based setups:</p>
-<div class="highlight"><pre><span></span><code>- Change `app.address` to `0.0.0.0:9000`.
-- Change `db.host` to `listmonk_db`.
-</code></pre></div>
+<ul>
+<li>Change <code>app.address</code> to <code>0.0.0.0:9000</code>.</li>
+<li>Change <code>db.host</code> to <code>listmonk_db</code>.</li>
+</ul>
+</div>
 <p>Here's a sample <code>config.toml</code> you can use:</p>
 <div class="highlight"><pre><span></span><code><span class="k">[app]</span>
 <span class="n">address</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;0.0.0.0:9000&quot;</span>
@@ -888,11 +891,18 @@ sh<span class="w"> </span>-c<span class="w"> </span><span class="s2">&quot;</spa
 <span class="n">max_lifetime</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="s">&quot;300s&quot;</span>
 </code></pre></div>
 <p>Mount the local <code>config.toml</code> inside the container at <code>listmonk/config.toml</code>.</p>
-<p>!!! tip - See <a href="../configuration">configuring with environment variables</a> for variables like <code>app.admin_password</code> and <code>db.password</code> - Ensure that both <code>app</code> and <code>db</code> containers are in running. If the containers are not running, restart them <code>docker-compose restart app db</code>. - Refer to <a href="https://yasoob.me/posts/setting-up-listmonk-opensource-newsletter-mailing/">this tutorial</a> for setting up a production instance with Docker + Nginx + LetsEncrypt SSL.</p>
+<div class="admonition tip">
+<p class="admonition-title">Tip</p>
+<ul>
+<li>See <a href="../configuration">configuring with environment variables</a> for variables like <code>app.admin_password</code> and <code>db.password</code></li>
+<li>Ensure that both <code>app</code> and <code>db</code> containers are in running. If the containers are not running, restart them <code>docker-compose restart app db</code>.</li>
+<li>Refer to <a href="https://yasoob.me/posts/setting-up-listmonk-opensource-newsletter-mailing/">this tutorial</a> for setting up a production instance with Docker + Nginx + LetsEncrypt SSL.</li>
+</ul>
+</div>
 <div class="admonition info">
 <p class="admonition-title">Info</p>
-</div>
 <p>The example <code>docker-compose.yml</code> file works with Docker Engine 18.06.0+ and <code>docker-compose</code> which supports file format 3.7.</p>
+</div>
 <h4 id="using-docker-compose-docker-swarm-stacks-secrets">Using docker-compose: Docker Swarm / Stacks + Secrets<a class="headerlink" href="#using-docker-compose-docker-swarm-stacks-secrets" title="Permanent link">&para;</a></h4>
 <p>Using Docker Swarm (e.g. in Portainer) can come in very handy.
 E.g. using listmonk as a Stack (DB + Listmonk).
@@ -919,8 +929,8 @@ if the listmonk database already exists (that is basically the <code>--idempoten
 <p class="admonition-title">Info</p>
 </div>
 <p>The above command passes a secret as config toml.
-If you are working with docker secrets (recommended) then the only thing you have to do is creating
-a properly named secret with <code>docker secret create listmonk_config_toml ./your_config.toml</code>. If however you want to simply use a <code>volume</code> for that you have to remove the <code>--config=/run...</code> part in the <code>docker-compose.yml</code> file and also get rid of the <code>secrets</code> definitions.</p>
+  If you are working with docker secrets (recommended) then the only thing you have to do is creating
+  a properly named secret with <code>docker secret create listmonk_config_toml ./your_config.toml</code>. If however you want to simply use a <code>volume</code> for that you have to remove the <code>--config=/run...</code> part in the <code>docker-compose.yml</code> file and also get rid of the <code>secrets</code> definitions.</p>
 <h2 id="compiling-from-source">Compiling from source<a class="headerlink" href="#compiling-from-source" title="Permanent link">&para;</a></h2>
 <p>To compile the latest unreleased version (<code>master</code> branch):</p>
 <ol>
@@ -935,8 +945,6 @@ a properly named secret with <code>docker secret create listmonk_config_toml ./y
 <br />
 <a href="https://www.pikapods.com/pods?run=listmonk"><img src="https://www.pikapods.com/static/run-button.svg" alt="Deploy on PikaPod" /></a>
 <a href ="https://github.com/paulrudy/listmonk-on-fly">Tutorial for deploying on Fly.io</a></p>
-<div class="highlight"><pre><span></span><code>
-</code></pre></div>
 
 
 
