@@ -58,15 +58,15 @@ services:
       # using idempotent with &&
       # but that would need sh -c and isn't just one process...
       # command: [sh, -c, "yes | ./listmonk --install --idempotent --config ... && ./listmonk --config config-demo.toml"]
-    secrets:
+    secrets:  # < remove me if you wanna use the config-demo.toml with volumes instead
       - listmonk_config_toml
 
 networks:
   listmonk:
-  web:
+  web: # for reverse proxy for example. if you dont have / use one, just remove this
     external: true
 
-secrets:
+secrets: # remove me if you wanna use the config-demo.toml with volumes instead
   listmonk_config_toml:
     external: true
 
