@@ -267,6 +267,10 @@ func handleTestSMTPSettings(c echo.Context) error {
 	password := ko.String("password")
 	// now we have to check if the password only contains •••••••••••••••• chars because
 	// then we want to load the stored password instead.
+
+	app.log.Printf("Testing SMTP settings PW", password)
+	app.log.Printf("Testing SMTP settings PW", strings.Repeat(pwdMask, len(password)))
+
 	if password == strings.Repeat(pwdMask, len(password)) {
 		errStr := "Doing a Test connection with a pre-existing/saved password is currently not supported. You can only test the connection for a new password (without saving it before)"
 		app.log.Printf(errStr)
